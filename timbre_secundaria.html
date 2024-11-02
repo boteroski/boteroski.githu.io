@@ -1,0 +1,272 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Secundaria - Sistema de Timbres </title>
+    <style>
+        body {
+            font-family: Verdana, Geneva, sans-serif;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            height: 100vh;
+            background-color: #0a0a23;
+            background-size: cover;
+            color: white;
+            margin: 0;
+            position: relative;
+            overflow: hidden; 
+        }
+
+        .digital-clock, .next-timbre {
+            position: absolute;
+            background-color: #001f3f;
+            padding: 10px 20px;
+            border-radius: 10px;
+            box-shadow: 0 4px 10px rgba(0, 0, 0, 0.5);
+            font-size: 24px;
+            color: #00d2ff;
+            text-align: center;
+            font-family: Verdana, Geneva, sans-serif;
+        }
+
+        .digital-clock {
+            top: 20px;
+            right: 20px;
+        }
+
+        .next-timbre {
+            top: 20px;
+            left: 20px;
+        }
+
+        .center-button {
+            position: absolute;
+            top: 10px; 
+            left: 50%; 
+            transform: translateX(-50%); 
+            margin: 0;
+            padding: 20px;
+            background-color: #0077ff;
+            background-image: linear-gradient(145deg, #0077ff, #001f3f);
+            color: white;
+            border: none;
+            border-radius: 50%;
+            font-size: 18px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            box-shadow: 0 8px 15px rgba(0, 0, 0, 0.5), inset 0 4px 4px rgba(255, 255, 255, 0.2);
+        }
+
+        .diagonal-buttons {
+            display: flex;
+            justify-content: space-between;
+            width: 80vw; 
+            height: 30vh; 
+            position: relative;
+        }
+
+        .diagonal-button {
+            padding: 45px;
+            color: white;
+            cursor: pointer;
+            font-size: 22px;
+            text-transform: uppercase;
+            transition: all 0.3s ease;
+            box-shadow: 0 8px 15px rgba(0, 0, 0, 0.5), inset 0 4px 4px rgba(255, 255, 255, 0.2);
+        }
+        .diagonal-button.hexagonal {
+            background-color: #001f3f;
+            background-image: linear-gradient(145deg, #001f3f, #0066cc);
+            clip-path: polygon(50% 0%, 90% 25%, 90% 75%, 50% 100%, 10% 75%, 10% 25%);
+            border-radius: 20px;
+        }
+        .diagonal-button:hover {
+            transform: scale(1.2);
+            opacity: 0.85;
+            box-shadow: rgba(255, 255, 255, 0.621), inset 0 6px 6px rgba(255, 255, 255, 0.3);
+        }
+
+        #timetable {
+            margin-left: 350px;
+            margin-top: 10px;
+            padding: 15px; 
+            width: 30%; 
+            background-color: #0d2c54;
+            border-radius: 15px;
+            box-shadow: 0 8px 15px rgba(0, 0, 0, 0.5);
+            display: none;
+            text-align: center;
+        }
+
+        h3 {
+            font-size: 24px;
+            margin-bottom: 10px;
+            color: #00eaff;
+            text-shadow: 0 0 5px rgba(0, 234, 255, 0.5);
+        }
+
+        p {
+            font-size: 18px;
+            margin: 5px 0;
+        }
+
+        footer {
+            font-size: 14px;
+            margin-top: 20px;
+        }
+
+        footer p {
+            display: inline;
+            margin-right: 10px;
+        }
+
+        footer a {
+            color: #00d2ff;
+            text-decoration: none;
+        }
+
+        footer a:hover {
+            text-decoration: underline;
+        }
+    </style>
+</head>
+<body>
+
+    <header>
+        <br><br><br><br><br>
+    </header>
+
+    <div class="digital-clock" id="digital-clock">00:00</div>
+    <div class="next-timbre" id="next-timbre">Siguiente en: --:--</div>
+
+    <main>
+        <button id="main-btn" class="center-button" onclick="playTimbre()">Timbre</button>
+
+        <section class="diagonal-buttons">
+            <button class="diagonal-button hexagonal" onclick="setSchedule(1)">Horario 1</button>
+            <button class="diagonal-button hexagonal" onclick="setSchedule(2)">Horario 2</button>
+            <button class="diagonal-button hexagonal" onclick="setSchedule(3)">Horario 3</button>
+            <button class="diagonal-button hexagonal" onclick="setSchedule(4)">Horario 4</button>
+        </section>
+
+        <article id="timetable">
+            <h3>Horas a las que sonará el timbre</h3>
+            <div id="time-list"></div>
+        </article>
+
+        <audio id="timbre-sound" src="timbre.mp3" preload="auto"></audio>
+    </main>
+
+    <footer>
+        <p>&copy; 2024 Sistema de Timbres. Todos los derechos reservados.</p>
+        <a href="index.html">Ir a Formulario de Inicio de Sesión</a>
+    </footer>
+
+    <script>
+        let scheduleIntervals = [];
+        let nextTimbreTime;
+        let timerId;
+
+        function setSchedule(scheduleNumber) {
+            clearIntervals();
+            document.getElementById('timetable').style.display = 'block';
+            switch (scheduleNumber) {
+                case 1: setHorario1(); break;
+                case 2: setHorario2(); break;
+                case 3: setHorario3(); break;
+                case 4: setHorario4(); break;
+            }
+        }
+
+        function setHorario1() { updateTimetable(['6:15', '7:00', '7:45', '9:15', '10:00', '11:15']); }
+        function setHorario2() { updateTimetable(['6:15', '7:00', '7:45', '8:00', '9:00', '9:45', '10:30', '11:45']); }
+        function setHorario3() { updateTimetable(['6:15', '7:15', '9:30', '10:00', '11:00', '12:15']); }
+        function setHorario4() { updateTimetable(['6:15', '8:30', '9:00', '10:15', '11:15', '12:15','13:09']); }
+
+        function updateTimetable(times) {
+            let timeList = document.getElementById('time-list');
+            timeList.innerHTML = '';
+            let now = new Date();
+            let foundFuture = false;
+
+            times.forEach(time => {
+                let [hours, minutes] = time.split(':').map(Number);
+                let timbreTime = new Date(now.getFullYear(), now.getMonth(), now.getDate(), hours, minutes, 0);
+
+                if (timbreTime > now && !foundFuture) {
+                    nextTimbreTime = timbreTime;
+                    foundFuture = true;
+                } else if (timbreTime <= now) {
+                    timbreTime.setDate(timbreTime.getDate() + 1); // Programar para el siguiente día si ya pasó
+                }
+
+                let listItem = document.createElement('p');
+                listItem.innerText = time;
+                timeList.appendChild(listItem);
+
+                scheduleIntervals.push(setInterval(() => {
+                    if (new Date() >= timbreTime) {
+                        playTimbre();
+                        timbreTime.setDate(timbreTime.getDate() + 1); // Reprogramar para el siguiente día
+                    }
+                }, 1000));
+            });
+
+            if (!foundFuture) {
+                nextTimbreTime = null; // Si no se encuentra un próximo timbre
+            }
+            startCountdown();
+        }
+
+        function playTimbre() {
+            document.getElementById('timbre-sound').play();
+            
+        }
+
+        function clearIntervals() {
+            scheduleIntervals.forEach(clearInterval);
+            scheduleIntervals = [];
+        }
+
+        function startCountdown() {
+            updateCountdown();
+            timerId = setInterval(updateCountdown, 1000);
+        }
+
+        function updateCountdown() {
+            if (nextTimbreTime) {
+                let now = new Date();
+                let timeDiff = Math.max(0, nextTimbreTime - now);
+                let hours = Math.floor((timeDiff % (1000 * 60 * 60 * 24)) / (1000 * 60 * 60));
+                let minutes = Math.floor((timeDiff % (1000 * 60 * 60)) / (1000 * 60));
+                let seconds = Math.floor((timeDiff % (1000 * 60)) / 1000);
+                document.getElementById('next-timbre').innerText = `Siguiente en: ${hours}:${minutes.toString().padStart(2, '0')}:${seconds.toString().padStart(2, '0')}`;
+            } else {
+                document.getElementById('next-timbre').innerText = "Siguiente en: --:--";
+            }
+        }
+
+        function updateNextTimbre() {
+            let now = new Date();
+            if (scheduleIntervals.length > 0) {
+                let nextTimes = scheduleIntervals.map(interval => new Date(interval)).filter(t => t > now);
+                if (nextTimes.length > 0) {
+                    nextTimbreTime = new Date(Math.min(...nextTimes));
+                } else {
+                    nextTimbreTime = null;
+                }
+            }
+            startCountdown();
+        }
+
+        setInterval(() => {
+            let now = new Date();
+            document.getElementById('digital-clock').innerText = now.toLocaleTimeString();
+        }, 1000);
+
+    </script>
+</body>
+</html>

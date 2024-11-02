@@ -1,0 +1,334 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Primaria - Sistema de Timbres</title>
+    <style>
+        body {
+            font-family: Verdana, Geneva, sans-serif;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            height: 100vh;
+            background-color: #3498db;
+            background-size: cover;
+            color: white;
+            margin: 0;
+            position: relative;
+            overflow: hidden; 
+        }
+
+        .digital-clock {
+            position: absolute;
+            top: 20px;
+            right: 20px;
+            background-color: #022345;
+            padding: 10px 20px;
+            border-radius: 10px;
+            box-shadow: 0 4px 10px rgba(255, 255, 255, 0.621);
+            font-size: 24px;
+            color: #85e7fd;
+            text-align: center;
+            font-family: Verdana, Geneva, sans-serif;
+        }
+
+        .next-timbre {
+            position: absolute;
+            top: 20px;
+            left: 20px;
+            background-color: #015ebb;
+            padding: 10px 20px;
+            border-radius: 10px;
+            box-shadow: 0 4px 10px rgba(255, 255, 255, 0.621);
+            font-size: 24px;
+            color: #02d0fe;
+            text-align: center;
+            font-family: Verdana, Geneva, sans-serif;
+        }
+
+        .center-button {
+            position: absolute;
+            top: 10px; 
+            left: 50%; 
+            transform: translateX(-50%); 
+            margin: 0;
+            padding: 20px;
+            background-color: #015ebb;
+            background-image: linear-gradient(145deg, #015ebb, #001f3f);
+            color: white;
+            border: none;
+            border-radius: 50%;
+            font-size: 18px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            box-shadow: rgba(255, 255, 255, 0.621), inset 0 4px 4px rgba(255, 255, 255, 0.2);
+        }
+
+        .center-button:hover {
+            transform: translateX(-50%) scale(1.2); 
+            box-shadow: rgba(255, 255, 255, 0.621), inset 0 6px 6px rgba(255, 255, 255, 0.3);
+            opacity: 0.9;
+        }
+
+        .diagonal-buttons {
+            display: flex;
+            justify-content: space-between;
+            width: 80vw; 
+            height: 30vh; 
+            position: relative;
+        }
+
+        .diagonal-button {
+            padding: 45px;
+            color: white;
+            cursor: pointer;
+            font-size: 22px;
+            text-transform: uppercase;
+            transition: all 0.3s ease;
+            box-shadow: rgba(255, 255, 255, 0.621), inset 0 4px 4px rgba(255, 255, 255, 0.2);
+            transition: transform 0.5s ease; 
+            
+        }
+
+        .diagonal-button.circular {
+            background-color: #00d2ff;
+            background-image: linear-gradient(145deg, #00d2ff, #0077ff);
+            clip-path: circle(50%);
+        }
+
+        .diagonal-button.hexagonal {
+            background-color: #3498db;
+            background-image: linear-gradient(145deg, #3498db, #0066cc);
+            clip-path: polygon(50% 0%, 90% 25%, 90% 75%, 50% 100%, 10% 75%, 10% 25%);
+            
+        }
+
+        .diagonal-button:hover {
+            transform: scale(1.2);
+            opacity: 0.85;
+            box-shadow: rgba(255, 255, 255, 0.621), inset 0 6px 6px rgba(255, 255, 255, 0.3);
+        }
+
+        #timetable {
+            margin-left: 350px;
+            margin-top: 10px;
+            padding: 15px; 
+            width: 30%; 
+            background-color: #0d2c54;
+            border-radius: 15px;
+            box-shadow: rgba(255, 255, 255, 0.621);
+            display: none;
+            text-align: center;
+        }
+
+        h3 {
+            font-size: 24px;
+            margin-bottom: 10px;
+            color: #00eaff;
+            text-shadow: 0 0 5px rgba(0, 234, 255, 0.5);
+        }
+
+        p {
+            font-size: 18px;
+            margin: 5px 0;
+        }
+
+        .line {
+            width: 4px;
+            height: 50vh;
+            background-color: rgba(0, 211, 255, 0.5);
+            position: absolute;
+        }
+
+        .line.left {
+            left: -20px;
+        }
+
+        .line.right {
+            right: -20px;
+        }
+
+        footer {
+            font-size: 14px;
+            margin-top: 20px;
+        }
+
+        footer p {
+            display: inline;
+            margin-right: 10px;
+        }
+
+        footer a {
+            color: #00d2ff;
+            text-decoration: none;
+        }
+
+        footer a:hover {
+            text-decoration: underline;
+        }
+
+    </style>
+</head>
+<body>
+
+    <header>
+        <br><br><br><br><br>
+    </header>
+
+    <div class="digital-clock" id="digital-clock">00:00</div>
+    <div class="next-timbre" id="next-timbre">Siguiente en: --:--</div>
+
+    <main>
+        <button id="main-btn" class="center-button" onclick="playTimbre()">Timbre</button>
+
+        <section class="diagonal-buttons">
+            <button class="diagonal-button hexagonal" onclick="setSchedule(1)">Horario 1</button>
+            <button class="diagonal-button hexagonal" onclick="setSchedule(2)">Horario 2</button>
+            <button class="diagonal-button hexagonal" onclick="setSchedule(3)">Horario 3</button>
+            <button class="diagonal-button hexagonal" onclick="setSchedule(4)">Horario 4</button>
+        </section>
+
+        <article id="timetable">
+            <h3>Horas a las que sonara el timbre</h3>
+            <div id="time-list"></div>
+        </article>
+
+        <audio id="timbre-sound" src="timbre.mp3" preload="auto"></audio>
+    </main>
+
+    <div class="line left"></div>
+    <div class="line right"></div>
+
+    <footer>
+        <p>&copy; 2024 Sistema de Timbres. Todos los derechos reservados.</p>
+        <a href="index.html">Ir a Formulario de Inicio de Sesión</a>
+    </footer>
+
+    <script>
+        let scheduleIntervals = [];
+        let nextTimbreTime;
+        let timerId;
+
+        function setSchedule(scheduleNumber) {
+            clearIntervals();
+            document.getElementById('timetable').style.display = 'block';
+            switch (scheduleNumber) {
+                case 1:
+                    setHorario1();
+                    break;
+                case 2:
+                    setHorario2();
+                    break;
+                case 3:
+                    setHorario3();
+                    break;
+                case 4:
+                    setHorario4();
+                    break;
+            }
+        }
+
+        function setHorario1() {
+            let times = ['12:45', '13:30', '14:15', '15:00', '15:45', '16:30', '17:15'];
+            updateTimetable(times);
+        }
+
+        function setHorario2() {
+            let times = ['13:00', '13:55', '14:50', '15:45', '16:40', '17:35'];
+            updateTimetable(times);
+        }
+
+        function setHorario3() {
+            let times = ['12:15', '13:00', '13:45', '14:30', '15:15', '16:00'];
+            updateTimetable(times);
+        }
+
+        function setHorario4() {
+            let times = ['13:15', '14:00', '14:45', '15:30', '16:15', '17:00'];
+            updateTimetable(times);
+        }
+
+        function updateTimetable(times) {
+            let timeList = document.getElementById('time-list');
+            timeList.innerHTML = '';
+            let now = new Date();
+
+            let futureTimes = times
+                .map(time => {
+                    let [hours, minutes] = time.split(':').map(Number);
+                    let timbreTime = new Date();
+                    timbreTime.setHours(hours, minutes, 0, 0);
+                    return timbreTime > now ? timbreTime : null;
+                })
+                .filter(time => time !== null);
+
+            if (futureTimes.length > 0) {
+                nextTimbreTime = futureTimes[0];
+            }
+
+            futureTimes.forEach(timbreTime => {
+                let listItem = document.createElement('p');
+                listItem.innerText = `${timbreTime.getHours()}:${String(timbreTime.getMinutes()).padStart(2, '0')}`;
+                timeList.appendChild(listItem);
+            });
+
+            startCountdown();
+        }
+
+        function playTimbre() {
+            document.getElementById('timbre-sound').play();
+        }
+
+        function startCountdown() {
+            timerId = setInterval(updateCountdown, 1000);
+        }
+
+        function clearIntervals() {
+            clearInterval(timerId);
+        }
+
+        function updateCountdown() {
+            if (nextTimbreTime) {
+                let now = new Date();
+                let timeDiff = nextTimbreTime - now;
+
+                if (timeDiff <= 0) {
+                    clearInterval(timerId);
+                    document.getElementById('next-timbre').innerText = "¡Es hora del timbre!";
+                    playTimbre();
+
+                    let timetable = document.querySelectorAll("#time-list p");
+                    if (timetable.length > 0) {
+                        let nextIndex = Array.from(timetable).findIndex(p => p.innerText === `${nextTimbreTime.getHours()}:${String(nextTimbreTime.getMinutes()).padStart(2, '0')}`) + 1;
+                        if (nextIndex < timetable.length) {
+                            let [hours, minutes] = timetable[nextIndex].innerText.split(':').map(Number);
+                            nextTimbreTime = new Date();
+                            nextTimbreTime.setHours(hours, minutes, 0, 0);
+                            startCountdown();
+                        } else {
+                            nextTimbreTime = null;
+                        }
+                    }
+                } else {
+                    let seconds = Math.floor((timeDiff / 1000) % 60);
+                    let minutes = Math.floor((timeDiff / 1000 / 60) % 60);
+                    let hours = Math.floor((timeDiff / (1000 * 60 * 60)) % 24);
+                    document.getElementById('next-timbre').innerText = `Siguiente Timbre: ${hours}h ${minutes}m ${seconds}s`;
+                }
+            }
+        }
+
+        function startClock() {
+            setInterval(() => {
+                const now = new Date();
+                document.getElementById('digital-clock').innerText = now.toLocaleTimeString();
+            }, 1000);
+        }
+
+        startClock();
+    </script>
+
+</body>
+</html>
